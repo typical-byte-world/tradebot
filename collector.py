@@ -59,17 +59,19 @@ async def main():
     to = math.floor(time.time())
     if not os.path.isdir(arguments.directory):
         os.mkdir(arguments.directory)
-    await asyncio.gather(
-        *[
-            get_tick_history_and_convert_to_csv(
-                uri,
-                'R_10',
-                to - 60 * arguments.coverage * (i + 1),
-                to - 60 * arguments.coverage * i,
-                arguments.directory
-            ) for i in range(arguments.number)
-        ]
-    )
+    for i in range(4):
+        offset = i * (arguments.number // 4) * arguments.coverage * 60
+        await asyncio.gather(
+            *[
+                get_tick_history_and_convert_to_csv(
+                    uri,
+                    'R_10',
+                    to - offset - (j + 1) * arguments.coverage * 60,
+                    to - offset - j * arguments.coverage * 60,
+                    arguments.directory
+                ) for j in range(arguments.number // 4)
+            ]
+        )
 
 
 asyncio.run(main())
