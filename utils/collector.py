@@ -2,7 +2,6 @@
 
 import argparse
 import asyncio
-import concurrent.futures
 import csv
 import json
 import math
@@ -37,14 +36,14 @@ def convert_to_csv(tick_history: dict, file_name: str):
             writer.writerow([time_, price])
 
 
-async def get_tick_history_and_convert_to_csv(executor: object, uri: str, symbol: str, from_: int, to: int,
+async def get_tick_history_and_convert_to_csv(uri: str, symbol: str, from_: int, to: int,
                                               directory: str):
     while True:
         file_name = os.path.join(directory, f'{get_random_string()}.csv')
         if not os.path.isfile(file_name):
             break
     await asyncio.get_running_loop().run_in_executor(
-        executor,
+        None,
         convert_to_csv,
         await get_tick_history(
             uri,
@@ -91,19 +90,17 @@ async def main():
     to = math.floor(time.time())
     if not os.path.isdir(arguments.directory):
         os.mkdir(arguments.directory)
-    with concurrent.futures.ProcessPoolExecutor() as thread_pool_executor:
-        await asyncio.gather(
-            *[
-                get_tick_history_and_convert_to_csv(
-                    thread_pool_executor,
-                    uri,
-                    'R_10',
-                    to - (i + 1) * arguments.coverage * 60,
-                    to - i * arguments.coverage * 60,
-                    arguments.directory
-                ) for i in range(arguments.number)
-            ]
-        )
+    await asyncio.gather(
+        *[
+            get_tick_history_and_convert_to_csv(
+                uri,
+                'R_10',
+                to - (i + 1) * arguments.coverage * 60,
+                to - i * arguments.coverage * 60,
+                arguments.directory
+            ) for i in range(arguments.number)
+        ]
+    )
 
 
 asyncio.run(main())
