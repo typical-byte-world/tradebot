@@ -2,6 +2,7 @@
 
 import argparse
 import asyncio
+import concurrent.futures
 import csv
 import json
 import math
@@ -36,40 +37,71 @@ def convert_to_csv(tick_history: dict, file_name: str):
             writer.writerow([time_, price])
 
 
-async def get_tick_history_and_convert_to_csv(uri: str, symbol: str, from_: int, to: int, directory: str):
+async def get_tick_history_and_convert_to_csv(executor: object, uri: str, symbol: str, from_: int, to: int,
+                                              directory: str):
     while True:
         file_name = os.path.join(directory, f'{get_random_string()}.csv')
         if not os.path.isfile(file_name):
             break
-    convert_to_csv(
-        await get_tick_history(uri, symbol, from_, to),
+    await asyncio.get_running_loop().run_in_executor(
+        executor,
+        convert_to_csv,
+        await get_tick_history(
+            uri,
+            symbol,
+            from_,
+            to
+        ),
         file_name
     )
 
 
 async def main():
     argument_parser = argparse.ArgumentParser()
-    argument_parser.add_argument('--app_id', type=int, required=True, help='application ID', metavar='id')
-    argument_parser.add_argument('--coverage', type=int, required=True, help='csv coverage in minutes',
-                                 metavar='minutes')
-    argument_parser.add_argument('--number', type=int, required=True, help='number of csv', metavar='number')
-    argument_parser.add_argument('--directory', default='', type=str, help='change directory', metavar='directory')
+    argument_parser.add_argument(
+        '--app_id',
+        type=int,
+        required=True,
+        help='application ID',
+        metavar='id'
+    )
+    argument_parser.add_argument(
+        '--coverage',
+        type=int,
+        required=True,
+        help='csv coverage in minutes',
+        metavar='minutes'
+    )
+    argument_parser.add_argument(
+        '--number',
+        type=int,
+        required=True,
+        help='number of csv',
+        metavar='number'
+    )
+    argument_parser.add_argument(
+        '--directory',
+        default='',
+        type=str,
+        help='change directory',
+        metavar='directory'
+    )
     arguments = argument_parser.parse_args()
     uri = f'wss://ws.binaryws.com/websockets/v3?app_id={arguments.app_id}'
     to = math.floor(time.time())
     if not os.path.isdir(arguments.directory):
         os.mkdir(arguments.directory)
-    for i in range(4):
-        offset = i * (arguments.number // 4) * arguments.coverage * 60
+    with concurrent.futures.ProcessPoolExecutor() as thread_pool_executor:
         await asyncio.gather(
             *[
                 get_tick_history_and_convert_to_csv(
+                    thread_pool_executor,
                     uri,
                     'R_10',
-                    to - offset - (j + 1) * arguments.coverage * 60,
-                    to - offset - j * arguments.coverage * 60,
+                    to - (i + 1) * arguments.coverage * 60,
+                    to - i * arguments.coverage * 60,
                     arguments.directory
-                ) for j in range(arguments.number // 4)
+                ) for i in range(arguments.number)
             ]
         )
 

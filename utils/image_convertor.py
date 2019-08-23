@@ -1,9 +1,9 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 import os
 import time
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import pandas as pd
 
 DATA_FOLDER = '../data'
 RESULTS = '../results'
@@ -13,7 +13,7 @@ if not os.path.isdir(RESULTS):
     os.mkdir(RESULTS)
 
 
-def save_image(data, dir, name):
+def save_image(data, dir_, name):
     mpl.rcParams['savefig.pad_inches'] = 0
 
     ax = plt.axes([0, 0, 1, 1], frameon=False)
@@ -25,12 +25,12 @@ def save_image(data, dir, name):
     # Plot the data.
     plt.plot(data)
     # Save the figure and display the figure.
-    plt.savefig(f'{dir}/{name}')
+    plt.savefig(f'{dir_}/{name}')
     plt.show()
     time.sleep(0.5)
 
-    if os.path.isfile(f'{dir}/{name}'):
-        print(f'File {name} succsesful saved!')
+    if os.path.isfile(f'{dir_}/{name}'):
+        print(f'File {name} succesful saved!')
 
 
 def main():
