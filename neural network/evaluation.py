@@ -64,9 +64,13 @@ class SimpleNet(nn.Module):
         return output
 
 
-def evaluate_model(img, model):
-    image = Image.open(img).convert('RGB')
+def classify(img):
+    ckpt = torch.load('model_4.model')
+    model = SimpleNet(3)
+    model.load_state_dict(ckpt)
+    model.eval()
 
+    image = Image.open(img).convert('RGB')
     transformation = transforms.Compose([transforms.Resize((128, 128)),
                                          transforms.ToTensor(),
                                          transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
