@@ -74,7 +74,6 @@ def classify(img):
     transformation = transforms.Compose([transforms.Resize((128, 128)),
                                          transforms.ToTensor(),
                                          transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-
                                          ])
     image_tensor = transformation(image).float()
     image_tensor = image_tensor.unsqueeze_(0)

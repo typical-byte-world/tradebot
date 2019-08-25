@@ -1,16 +1,5 @@
-import os
-import time
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import pandas as pd
-
-DATA_FOLDER = '../data'
-RESULTS = '../results'
-DATA = os.listdir(DATA_FOLDER)
-
-if not os.path.isdir(RESULTS):
-    os.mkdir(RESULTS)
 
 
 def save_image(data, dir_, name):
@@ -27,22 +16,3 @@ def save_image(data, dir_, name):
     plt.savefig(f'{dir_}/{name}')
     plt.show()
     # time.sleep(0.5)
-
-    if os.path.isfile(f'{dir_}/{name}'):
-        print(f'File {name} succesful saved!')
-
-
-def main():
-    for image in DATA:
-        data = pd.read_csv(f'{DATA_FOLDER}/{image}', index_col='time', engine='python')
-        print(data.shape)
-        name = image.split('.')[0]
-        name += '.png'
-        # save image
-        save_image(data, RESULTS, name)
-
-
-if __name__ == '__main__':
-    main()
-
-
