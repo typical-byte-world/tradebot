@@ -1,0 +1,15 @@
+{
+    "api_token": "",
+    "app_id": 0,
+    "bet": 1,
+    "steps": 7,
+    "chart_length": 10,
+    "y": 0,
+    "pause": 10,
+    "wait": 10,
+    "parameters": {
+        "symbol": "R_10",
+        "barrier": 0.459,
+        "contract_type": "CALL"
+    }
+}
