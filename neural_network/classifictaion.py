@@ -1,13 +1,13 @@
+import os
+
+import pandas as pd
 import torch
 import torch.nn as nn
-from torchvision.transforms import transforms
-from torch.utils.data import DataLoader
-from torch.optim import Adam
-from torch.autograd import Variable
-import numpy as np
-import pandas as pd
 from PIL import Image
-import os
+from torch.optim import Adam
+from torch.utils.data import DataLoader
+from torchvision.transforms import transforms
+
 
 class Unit(nn.Module):
     def __init__(self, in_channels, out_channels):

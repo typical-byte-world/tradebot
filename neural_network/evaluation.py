@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
-from torchvision.transforms import transforms
-from torch.autograd import Variable
 from PIL import Image
+from torch.autograd import Variable
+from torchvision.transforms import transforms
 
 
 class Unit(nn.Module):

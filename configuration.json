@@ -1,15 +1,15 @@
 {
     "app_id": 18933,
     "api_token": "6ueB7zkVArfD6La",
-    "bet": 1,
+    "base_bet": 10,
     "steps": 7,
     "chart_length": 10,
-    "y": 0,
+    "y": 0.3,
     "pause": 10,
     "wait": 10,
     "parameters": {
         "symbol": "R_10",
         "barrier": 0.459,
-        "contract_type": "CALL"
+        "basis": "stake"
     }
 }
