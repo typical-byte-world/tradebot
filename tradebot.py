@@ -5,6 +5,8 @@ import logging
 import math
 import time
 
+from neural_network.evaluation import classify
+from utils.image_convertor import save_image
 import binarycom
 
 
@@ -23,8 +25,13 @@ async def main():
         to = math.floor(time.time())
         tick_history = await binarycom.tick_history(websocket, parameters['symbol'],
                                                     to - configuration['chart_length'] * 60, to)
-        class_ = 1
-        # classify the data
+        img_array = tick_history['history']['prices']
+
+        # name
+        name = time.time()
+        save_image(img_array,'tmp', f'{name}.png')
+        class_ = classify(f'utils/{name}')
+
         if class_ == 0:
             logging.info('Неудачный график. Ожидаю...')
             await asyncio.sleep(configuration['wait'] * 60)
