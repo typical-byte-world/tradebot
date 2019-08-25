@@ -21,7 +21,7 @@ async def authorize(websocket, api_token: str) -> dict:
 
 async def tick_history(websocket, symbol: str, from_: int, to: int) -> dict:
     request = {
-        'tick_history': symbol,
+        'ticks_history': symbol,
         'start': from_,
         'end': to
     }
@@ -33,5 +33,12 @@ async def buy_contract(websocket, parameters: dict) -> dict:
         'buy': 1,
         'price': 9999,
         'parameters': parameters
+    }
+    return await _do(websocket, request)
+
+
+async def balance(websocket):
+    request = {
+        'balance': 1
     }
     return await _do(websocket, request)

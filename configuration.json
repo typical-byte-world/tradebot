@@ -4,12 +4,12 @@
     "base_bet": 10,
     "steps": 7,
     "chart_length": 10,
-    "y": 0.3,
+    "y": 0.03,
     "pause": 1,
     "wait": 1,
     "parameters": {
         "symbol": "R_10",
-        "barrier": 0.459,
+        "barrier": "+0.2",
         "basis": "stake"
     }
 }

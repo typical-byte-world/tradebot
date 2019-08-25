@@ -65,7 +65,7 @@ class SimpleNet(nn.Module):
 
 
 def classify(img):
-    ckpt = torch.load('model_4.model')
+    ckpt = torch.load('neural_network/model_4.model')
     model = SimpleNet(3)
     model.load_state_dict(ckpt)
     model.eval()
@@ -92,4 +92,4 @@ if __name__ == '__main__':
     model.load_state_dict(checkpoint)
     model.eval()
 
-    res = evaluate_model('path_to_img', model)
+    res = classify('path_to_img', model)

@@ -4,19 +4,20 @@ import json
 import math
 import time
 
+import binarycom
 from neural_network.evaluation import classify
 from utils.image_convertor import save_image
-import binarycom
 
 
 async def main():
     with open('configuration.json', mode='r') as configuration_file:
         configuration = json.load(configuration_file)
     websocket = await binarycom.connect(configuration['app_id'])
+    await binarycom.authorize(websocket, configuration['api_token'])
     steps = configuration['steps']
     parameters = copy.deepcopy(configuration['parameters'])
     parameters['amount'] = configuration['base_bet']
-    parameters['duration'] = configuration['chart_length'] * configuration['y'] * 60
+    parameters['duration'] = math.floor(configuration['chart_length'] * configuration['y'] * 60)
     parameters['duration_unit'] = 's'
     parameters['currency'] = 'USD'
     total_income = 0
@@ -25,11 +26,9 @@ async def main():
         tick_history = await binarycom.tick_history(websocket, parameters['symbol'],
                                                     to - configuration['chart_length'] * 60, to)
         img_array = tick_history['history']['prices']
-
-        # name
         name = time.time()
-        save_image(img_array,'tmp', f'{name}.png')
-        class_ = classify(f'utils/{name}')
+        save_image(img_array, 'tmp', f'{name}.png')
+        class_ = classify(f'tmp/{name}.png')
 
         if class_ == 0:
             print('Неудачный график. Ожидаю...')
@@ -38,18 +37,19 @@ async def main():
         if class_ == 1:
             print('График на понижение цены.')
             parameters['contract_type'] = 'PUT'
-            parameters['barrier'] = - 0.459
+            parameters['barrier'] = - configuration['parameters']['barrier']
 
         else:
             print('График на повышение цены.')
             parameters['contract_type'] = 'CALL'
-            parameters['barrier'] = - configuration['barrier']
+            parameters['barrier'] = configuration['parameters']['barrier']
         while True:
-            print('Авторизируюсь...')
-            client = await binarycom.authorize(websocket, configuration['api_token'])
             print('Покупаю...')
-            response = await binarycom.buy_contract(websocket, parameters)
-            income = response['buy']['balance_after'] - client['authorize']['balance']
+            balance_before_buy = await binarycom.balance(websocket)
+            await binarycom.buy_contract(websocket, parameters)
+            await asyncio.sleep(parameters['duration'] + 2)
+            balance_after_buy = await binarycom.balance(websocket)
+            income = balance_after_buy['balance']['balance'] - balance_before_buy['balance']['balance']
             print(f'Прибыль: {income}')
             total_income = total_income + income
             print(f'Общая прибыль: {total_income}')
@@ -62,6 +62,7 @@ async def main():
                 break
             else:
                 parameters['amount'] = configuration['base_bet']
+                steps = configuration['steps']
 
     await websocket.close()
 
