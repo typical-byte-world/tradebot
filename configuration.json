@@ -5,8 +5,8 @@
     "steps": 7,
     "chart_length": 10,
     "y": 0.3,
-    "pause": 10,
-    "wait": 10,
+    "pause": 1,
+    "wait": 1,
     "parameters": {
         "symbol": "R_10",
         "barrier": 0.459,
