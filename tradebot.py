@@ -3,10 +3,15 @@ import copy
 import json
 import math
 import time
+import os
+from time import gmtime, strftime
 
 from neural_network.evaluation import classify
 from utils.image_convertor import save_image
 import binarycom
+
+if not os.path.isdir('tmp'):
+    os.mkdir('tmp')
 
 
 async def main():
@@ -26,10 +31,10 @@ async def main():
                                                     to - configuration['chart_length'] * 60, to)
         img_array = tick_history['history']['prices']
 
-        # name
-        name = time.time()
+        # name of the image
+        name = strftime("%Y-%m-%d_%H:%M:%S", gmtime())
         save_image(img_array,'tmp', f'{name}.png')
-        class_ = classify(f'utils/{name}')
+        class_ = classify(f'tmp/{name}.png')
 
         if class_ == 0:
             print('Неудачный график. Ожидаю...')
