@@ -1,5 +1,4 @@
 import json
-import math
 
 import websockets
 
@@ -32,7 +31,7 @@ async def tick_history(websocket, symbol: str, from_: int, to: int) -> dict:
 async def buy_contract(websocket, parameters: dict) -> dict:
     request = {
         'buy': 1,
-        'price': math.inf,
+        'price': 9999,
         'parameters': parameters
     }
     return await _do(websocket, request)
