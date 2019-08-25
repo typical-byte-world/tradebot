@@ -5,13 +5,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 
-DATA_FOLDER = '../data'
-RESULTS = '../results'
-DATA = os.listdir(DATA_FOLDER)
-
-if not os.path.isdir(RESULTS):
-    os.mkdir(RESULTS)
-
 
 def save_image(data, dir_, name):
     mpl.rcParams['savefig.pad_inches'] = 0
@@ -23,16 +16,21 @@ def save_image(data, dir_, name):
 
     # Plot the data.
     plt.plot(data)
-    # Save the figure and display the figure.
     plt.savefig(f'{dir_}/{name}')
     plt.show()
-    # time.sleep(0.5)
 
     if os.path.isfile(f'{dir_}/{name}'):
         print(f'File {name} succesful saved!')
 
 
 def main():
+    DATA_FOLDER = '../data'
+    RESULTS = '../results'
+    DATA = os.listdir(DATA_FOLDER)
+
+    if not os.path.isdir(RESULTS):
+        os.mkdir(RESULTS)
+
     for image in DATA:
         data = pd.read_csv(f'{DATA_FOLDER}/{image}', index_col='time', engine='python')
         print(data.shape)
@@ -43,6 +41,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    pass
+    # main()
+
 
 

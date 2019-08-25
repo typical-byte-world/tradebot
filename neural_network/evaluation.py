@@ -92,4 +92,4 @@ if __name__ == '__main__':
     model.load_state_dict(checkpoint)
     model.eval()
 
-    res = evaluate_model('path_to_img', model)
+    res = classify('path_to_img', model)
