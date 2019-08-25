@@ -6,7 +6,6 @@ import os
 import time
 
 import binarycom
-from neural_network.evaluation import classify
 from utils.image_convertor import save_image
 
 
@@ -30,7 +29,7 @@ async def main():
                                                     to - configuration['chart_length'] * 60, to)
         name = time.time()
         save_image(tick_history['history']['prices'], 'tmp', f'{name}.png')
-        class_ = classify(f'tmp/{name}.png')
+        class_ = 2  # classify(f'tmp/{name}.png')
 
         if class_ == 0:
             print('Неудачный график. Ожидаю...')
@@ -49,6 +48,7 @@ async def main():
             print('Покупаю...')
             balance_before_buy = await binarycom.balance(websocket)
             await binarycom.buy_contract(websocket, parameters)
+            await asyncio.sleep(parameters['duration'] + 2)
             balance_after_buy = await binarycom.balance(websocket)
             income = balance_after_buy['balance']['balance'] - balance_before_buy['balance']['balance']
             print(f'Прибыль: {income}')
