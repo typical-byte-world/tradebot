@@ -13,8 +13,7 @@ from utils.image_convertor import save_image
 
 
 async def main():
-    with open('configuration.json', mode='r') as configuration_file:
-        configuration = json.load(configuration_file)
+    loop = asyncio.get_running_loop()
     if not os.path.isdir('images'):
         os.mkdir('images')
     if not os.path.isdir('logs'):
@@ -24,6 +23,8 @@ async def main():
                         filemode='a', level=logging.INFO, format='%(asctime)s - %(message)s',
                         datefmt='%d-%b-%y::%H:%M:%S')
 
+    with open('configuration.json', mode='r') as configuration_file:
+        configuration = json.load(configuration_file)
     websocket = await binarycom.connect(configuration['app_id'])
     print('Авторизируюсь...')
     await binarycom.authorize(websocket, configuration['api_token'])
@@ -44,10 +45,9 @@ async def main():
         class_ = classify(f'images/{name}.png')
 
         if class_ == 0:
+            await loop.run_in_executor(None, logging.info, f'Image: {name}, result: Неподходящий график')
             print('Неудачный график. Ожидаю...')
             await asyncio.sleep(configuration['wait'] * 60)
-            message = 'Неподходящий график'
-            logging.info(f'Image: {name}, result: {message}')
             continue
         if class_ == 1:
             print('График на понижение цены.')
@@ -60,8 +60,8 @@ async def main():
             parameters['contract_type'] = 'CALL'
             parameters['barrier'] = configuration['parameters']['barrier']
             message = 'Повышающийся график'
+        await loop.run_in_executor(None, logging.info, f'Image:{name}, result: {message}')
 
-        logging.info(f'Image:{name}, result: {message}')
         while True:
             print('Покупаю...')
             balance_before_buy = await binarycom.balance(websocket)
@@ -72,11 +72,13 @@ async def main():
             print(f'Прибыль: {income}')
             total_income = total_income + income
             print(f'Общая прибыль: {total_income}')
-            logging.info(
-                f"Баланс перед покупкой: {balance_before_buy}, баланс после покупки: {balance_after_buy}"
-                f"Доход с последней ставки: {income}, общий доход за текущую авторизацию: {total_income}"
-                f"Степ: {steps}, текущая сумма ставки: {parameters['amount']}"
-            )
+
+            await loop.run_in_executor(None, logging.info,
+                               f"Баланс перед покупкой: {balance_before_buy['balance']['balance']},"
+                               f" баланс после покупки: {balance_after_buy['balance']['balance']}"
+                               f"Доход с последней ставки: {income}, общий доход за текущую авторизацию: {total_income}"
+                               f"Степ: {steps}, текущая сумма ставки: {parameters['amount']}"
+                               )
             if income < 0:
                 await asyncio.sleep(configuration['pause'] * 60)
                 if steps > 0:
@@ -85,7 +87,7 @@ async def main():
                     steps = steps - 1
                 break
             else:
-                logging.info(f'Начинаю заново. Начальная ставка: {configuration["base_bet"]}')
+                await loop.run_in_executor(None, logging.info, f'Начинаю заново. Начальная ставка: {configuration["base_bet"]}')
                 print('Устанавливаю базовую ставку...')
                 parameters['amount'] = configuration['base_bet']
                 steps = configuration['steps']
