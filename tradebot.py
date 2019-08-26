@@ -41,12 +41,12 @@ async def main():
         if class_ == 1:
             print('График на понижение цены.')
             parameters['contract_type'] = 'PUT'
-            parameters['barrier'] = - configuration['parameters']['barrier']
+            parameters['barrier'] = "{:.10f}".format(- configuration['barrier'])
 
         else:
             print('График на повышение цены.')
             parameters['contract_type'] = 'CALL'
-            parameters['barrier'] = configuration['parameters']['barrier']
+            parameters['barrier'] = "{:.10f}".format(configuration['barrier'])
         while True:
             print('Покупаю...')
             balance_before_buy = await binarycom.balance(websocket)
