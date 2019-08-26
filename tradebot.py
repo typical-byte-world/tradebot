@@ -1,11 +1,11 @@
 import asyncio
 import copy
 import json
+import logging
 import math
 import os
 import time
-import logging
-from time import gmtime, strftime
+from time import localtime, strftime
 
 import binarycom
 from neural_network.evaluation import classify
@@ -20,8 +20,8 @@ async def main():
     if not os.path.isdir('logs'):
         os.mkdir('logs')
     # logging
-    logging.basicConfig(filename=f'logs/{strftime("%Y-%m-%d::%H:%M:%S", gmtime())}.log',
-                        filemode='a', level=logging.INFO, format='%(asctime)s - %(message)s',
+    logging.basicConfig(filename=f'logs/{strftime("%Y-%m-%d::%H:%M:%S", localtime())}.log',
+                        filemode='w', level=logging.INFO, format='%(asctime)s - %(message)s',
                         datefmt='%d-%b-%y::%H:%M:%S')
 
     websocket = await binarycom.connect(configuration['app_id'])
@@ -39,7 +39,7 @@ async def main():
         to = math.floor(time.time())
         tick_history = await binarycom.tick_history(websocket, parameters['symbol'],
                                                     to - configuration['chart_length'] * 60, to)
-        name = strftime("%Y-%m-%d::%H:%M:%S", gmtime())
+        name = strftime("%Y-%m-%d::%H:%M:%S", localtime())
         save_image(tick_history['history']['prices'], 'images', f'{name}.png')
         class_ = classify(f'images/{name}.png')
 
@@ -52,13 +52,13 @@ async def main():
         if class_ == 1:
             print('График на понижение цены.')
             parameters['contract_type'] = 'PUT'
-            parameters['barrier'] = - configuration['parameters']['barrier']
+            parameters['barrier'] = ':.10f'.format(- configuration['barrier'])
             message = 'Понижающийся график'
 
         else:
             print('График на повышение цены.')
             parameters['contract_type'] = 'CALL'
-            parameters['barrier'] = configuration['parameters']['barrier']
+            parameters['barrier'] = ':.10f'.format(configuration['barrier'])
             message = 'Повышающийся график'
 
         logging.info(f'Image:{name}, result: {message}')
@@ -73,7 +73,7 @@ async def main():
             total_income = total_income + income
             print(f'Общая прибыль: {total_income}')
             logging.info(
-                f"Баланс перед покупкой: {balance_before_buy}, баланс после покупки: {balance_after_buy}"
+                f"Баланс перед покупкой: {balance_before_buy['balance']['balance']}, баланс после покупки: {balance_after_buy['balance']['balance']}"
                 f"Доход с последней ставки: {income}, общий доход за текущую авторизацию: {total_income}"
                 f"Степ: {steps}, текущая сумма ставки: {parameters['amount']}"
             )
@@ -89,7 +89,6 @@ async def main():
                 print('Устанавливаю базовую ставку...')
                 parameters['amount'] = configuration['base_bet']
                 steps = configuration['steps']
-
 
     await websocket.close()
 
