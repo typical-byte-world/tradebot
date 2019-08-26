@@ -16,7 +16,9 @@ async def main():
     if not os.path.isdir('tmp'):
         os.mkdir('tmp')
     websocket = await binarycom.connect(configuration['app_id'])
+    print('Авторизируюсь...')
     await binarycom.authorize(websocket, configuration['api_token'])
+    print('ОК')
     steps = configuration['steps']
     parameters = copy.deepcopy(configuration['parameters'])
     parameters['amount'] = configuration['base_bet']
@@ -63,6 +65,7 @@ async def main():
                     steps = steps - 1
                 break
             else:
+                print('Устанавливаю базовую ставку...')
                 parameters['amount'] = configuration['base_bet']
                 steps = configuration['steps']
 
