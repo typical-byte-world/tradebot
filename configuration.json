@@ -2,6 +2,7 @@
     "app_id": 18933,
     "api_token": "6ueB7zkVArfD6La",
     "base_bet": 10,
+    "barrier": 0.2,
     "steps": 7,
     "chart_length": 10,
     "y": 0.03,
@@ -9,7 +10,6 @@
     "wait": 1,
     "parameters": {
         "symbol": "R_10",
-        "barrier": "+0.2",
         "basis": "stake"
     }
 }
