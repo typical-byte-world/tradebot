@@ -1,10 +1,10 @@
 import asyncio
 import copy
 import json
+import logging
 import math
 import os
 import time
-import logging
 from time import gmtime, strftime
 
 import binarycom
@@ -74,11 +74,11 @@ async def main():
             print(f'Общая прибыль: {total_income}')
 
             await loop.run_in_executor(None, logging.info,
-                               f"Баланс перед покупкой: {balance_before_buy['balance']['balance']},"
-                               f" баланс после покупки: {balance_after_buy['balance']['balance']}"
-                               f"Доход с последней ставки: {income}, общий доход за текущую авторизацию: {total_income}"
-                               f"Степ: {steps}, текущая сумма ставки: {parameters['amount']}"
-                               )
+                                       f"Баланс перед покупкой: {balance_before_buy['balance']['balance']},"
+                                       f" баланс после покупки: {balance_after_buy['balance']['balance']}"
+                                       f"Доход с последней ставки: {income}, общий доход за текущую авторизацию: {total_income}"
+                                       f"Степ: {steps}, текущая сумма ставки: {parameters['amount']}"
+                                       )
             if income < 0:
                 await asyncio.sleep(configuration['pause'] * 60)
                 if steps > 0:
@@ -87,11 +87,11 @@ async def main():
                     steps = steps - 1
                 break
             else:
-                await loop.run_in_executor(None, logging.info, f'Начинаю заново. Начальная ставка: {configuration["base_bet"]}')
+                await loop.run_in_executor(None, logging.info,
+                                           f'Начинаю заново. Начальная ставка: {configuration["base_bet"]}')
                 print('Устанавливаю базовую ставку...')
                 parameters['amount'] = configuration['base_bet']
                 steps = configuration['steps']
-
 
     await websocket.close()
 
