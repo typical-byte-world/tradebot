@@ -10,4 +10,4 @@ pytz==2019.2
 six==1.12.0
 torch==1.2.0
 torchvision==0.4.0
-websockets==8.0.2
+websockets==9.1
